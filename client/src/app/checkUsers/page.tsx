@@ -4,6 +4,7 @@ import { ethers } from "ethers";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Web3Modal from "web3modal";
+import { setAuthToken } from "../utils/auth";
 
 const web3Modal = new Web3Modal({
   cacheProvider: true,
@@ -43,6 +44,7 @@ const CheckUserPage = () => {
           return;
         }
       } catch (error) {
+        console.error("Error fetching wallet address:", error);
         alert("Error fetching wallet address: " + error);
         router.push("/");
         return;
@@ -54,34 +56,34 @@ const CheckUserPage = () => {
 
   useEffect(() => {
     const checkUserExists = async () => {
+      if (walletAddress.trim() === "") return;
+
       try {
         const response = await fetch(
           `/api/checkUsers?walletAddress=${walletAddress}`
         );
         if (response.ok) {
           const data = await response.json();
-          if (data.exists) {
-            setLoading(true);
+          setLoading(false);
+          if (data.exists && data.status === "Accepted") {
+            setAuthToken("client_auth_token");
             router.push("/create-campaign");
-            setLoading(false);
           } else {
-            setLoading(true);
+            setAuthToken("client_auth_token");
             router.push("/company-registration");
-            setLoading(false);
           }
         } else {
-          setLoading(true);
-          router.push("/company-registration");
           setLoading(false);
+          router.push("/company-registration");
         }
       } catch (error) {
+        console.error("Error checking user existence:", error);
         alert("Please ensure that you have connected to MetaMask");
+        router.push("/company-registration");
       }
     };
 
-    if (walletAddress.trim() !== "") {
-      checkUserExists();
-    }
+    checkUserExists();
   }, [walletAddress, router]);
 
   if (loading) {

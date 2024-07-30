@@ -1,7 +1,5 @@
 "use client";
 
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ethers } from "ethers";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -216,19 +214,6 @@ const App = () => {
         </div>
       ) : (
         <>
-          <div className="w-full flex justify-end pr-5">
-            {userExists && userData && userData.status !== "Accepted" && (
-              <button
-                aria-label="create campaign"
-                title="Create Campaign"
-                onClick={handleCreateCampaign}
-                className="mt-2 bg-blue-500 text-white font-bold py-4 px-4 rounded-xl focus:outline-none focus:shadow-outline"
-              >
-                <FontAwesomeIcon icon={faPlus} className="mr-2" />
-                Create Campaign
-              </button>
-            )}
-          </div>
           <div className="bg-white p-4 text-black rounded shadow mb-4 max-w-3xl w-full">
             {userExists && userData ? (
               <>

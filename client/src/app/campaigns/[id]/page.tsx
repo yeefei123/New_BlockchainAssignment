@@ -37,6 +37,7 @@ const CampaignDetails: React.FC = () => {
   const [uploadedMilestones, setUploadedMilestones] = useState<Set<number>>(
     new Set()
   );
+  const [ownerbuttonLoading, setownerbuttonLoading] = useState(false);
 
   const checkMetaMaskConnection = async () => {
     if (typeof window.ethereum === "undefined") {
@@ -119,10 +120,7 @@ const CampaignDetails: React.FC = () => {
       const endDate = ethers.BigNumber.isBigNumber(milestone.endDate)
         ? new Date(milestone.endDate.toNumber())
         : new Date(milestone.endDate);
-
-      startDate.setHours(0, 0, 0, 0);
-      endDate.setHours(0, 0, 0, 0);
-
+      console.log(startDate);
       if (now >= startDate && now <= endDate) {
         return milestone;
       }
@@ -181,7 +179,7 @@ const CampaignDetails: React.FC = () => {
         if (!address) {
           alert("Please sign in to your MetaMask first.");
           setLoading(false);
-          setButtonLoading(true);
+          setButtonLoading(false);
           return;
         }
         const now = new Date();
@@ -266,7 +264,6 @@ const CampaignDetails: React.FC = () => {
           signer
         );
         if (documentURL && selectedMilestoneId !== null) {
-          // Call smart contract function to update milestone with document URL
           await contract.updateMilestoneDocument(
             selectedMilestoneId,
             documentURL
@@ -293,8 +290,10 @@ const CampaignDetails: React.FC = () => {
   const handleCampaign = async (id: string) => {
     if (id) {
       setLoading(true);
+      setownerbuttonLoading(true);
       router.push(`/campaignOnwers/${id}`);
       setLoading(false);
+      setownerbuttonLoading(false);
     } else {
       alert("Campaign owner not found");
       setLoading(false);
@@ -520,10 +519,15 @@ const CampaignDetails: React.FC = () => {
             Report
           </button>
           <button
+            disabled={ownerbuttonLoading}
             onClick={() => handleCampaign(campaign.id)}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl focus:outline-none focus:shadow-outline"
+            className={`px-4 py-2 rounded ${
+              !ownerbuttonLoading
+                ? "bg-blue-500 text-white hover:bg-blue-700"
+                : "bg-gray-500 text-gray-400 cursor-not-allowed"
+            }`}
           >
-            View Campaign Owner
+            {ownerbuttonLoading ? "Loading..." : "View Campaign Onwer"}
           </button>
         </div>
         <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8">
@@ -624,7 +628,9 @@ const CampaignDetails: React.FC = () => {
               const isButtonDisabled =
                 !isCompleted ||
                 hasUploaded ||
-                new Date() < new Date(currentMilestone.startDate);
+                new Date() < new Date(currentMilestone.startDate) ||
+                milestone[index - 1].status !== "Completed" ||
+                milestone.fileUrl;
 
               return (
                 <div key={index} className="mb-4 text-black">

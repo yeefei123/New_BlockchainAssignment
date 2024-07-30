@@ -19,7 +19,7 @@ const CampaignHistoryPage = () => {
   const [isAccountLoggedIn, setIsAccountLoggedIn] = useState<boolean>(false);
   const [password, setPassword] = useState<string>("");
   const [passwordError, setPasswordError] = useState<string | null>(null);
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [campaigns, setCampaigns] = useState<any[]>([]);
 
   const contractAddress = process.env.NEXT_PUBLIC_CROWDFUNDING_CONTRACT_ADDRESS;
   const router = useRouter();

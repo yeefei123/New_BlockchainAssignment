@@ -36,11 +36,13 @@ const Sidebar: React.FC = () => {
           ))}
         </div>
 
-        <Icon
-          styles="bg-[#1c1c24] shadow-secondary"
-          imgUrl="/assets/profile.svg"
-          name="sun"
-        />
+        <Link href="/campaign-history" passHref>
+          <img
+            className="bg-[#1c1c24] shadow-secondary"
+            src="/assets/profile.svg"
+            alt="profile"
+          />
+        </Link>
       </div>
     </div>
   );

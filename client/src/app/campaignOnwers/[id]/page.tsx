@@ -145,19 +145,19 @@ const Web3Button = () => {
     );
   }
 
-  if (!isLoggedIn) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
-        <h1 className="text-2xl font-bold mb-4">
-          Please Connect Your MetaMask
-        </h1>
-        <p className="text-lg">
-          To view campaign details and reports, you need to connect your
-          MetaMask wallet.
-        </p>
-      </div>
-    );
-  }
+  // if (!isLoggedIn) {
+  //   return (
+  //     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
+  //       <h1 className="text-2xl font-bold mb-4">
+  //         Please Connect Your MetaMask
+  //       </h1>
+  //       <p className="text-lg">
+  //         To view campaign details and reports, you need to connect your
+  //         MetaMask wallet.
+  //       </p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="container mx-auto p-4 mt-5 bg-white rounded-xl text-black">

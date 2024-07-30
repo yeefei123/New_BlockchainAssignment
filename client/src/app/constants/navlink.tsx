@@ -27,8 +27,8 @@ export const navlinks: NavLink[] = [
     imgUrl: "/assets/create-campaign.svg",
   },
   {
-    name: "campaignHistory",
-    link: "/campaign-history",
+    name: "donationHistory",
+    link: "/donation-history",
     imgUrl: "/assets/history.svg",
   },
 ];

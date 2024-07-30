@@ -37,9 +37,14 @@ interface Report {
 }
 
 const AllCampaigns = () => {
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [campaigns, setCampaigns] = useState<any[]>([]);
   const [resolvedReports, setResolvedReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
+  const [buttonLoading, setButtonLoading] = useState<{
+    [key: string]: boolean;
+  }>({});
+  const [campaignButtonLoading, setCampaignButtonLoading] = useState(false);
+
   const router = useRouter();
   const [reportsLoaded, setReportsLoaded] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -141,8 +146,6 @@ const AllCampaigns = () => {
         const filteredCampaigns = campaignData.filter((campaign) =>
           resolvedReports.filter((report) => report.campaign_id === campaign.id)
         );
-
-        console.log(filteredCampaigns);
         setCampaigns(filteredCampaigns);
       } catch (error) {
         console.error("Error fetching campaigns:", error);
@@ -301,8 +304,10 @@ const AllCampaigns = () => {
         return;
       }
       setLoading(true);
+      setCampaignButtonLoading(true);
       router.push("checkUsers");
       setLoading(false);
+      setCampaignButtonLoading(false);
     } catch (error) {
       console.error("Error connecting to MetaMask:", error);
       alert(
@@ -311,10 +316,13 @@ const AllCampaigns = () => {
     }
   };
 
-  const handleCampaign = (id: string) => {
-    setLoading(true);
-    router.push(`/campaigns/${id}`);
-    setLoading(false);
+  const handleButtonClick = async (campaignId: string) => {
+    setButtonLoading((prev) => ({ ...prev, [campaignId]: true }));
+
+    // Introduce a small delay to allow the UI to update
+    setTimeout(() => {
+      router.push(`/campaigns/${campaignId}`);
+    }, 100);
   };
 
   return (
@@ -322,21 +330,21 @@ const AllCampaigns = () => {
       <div className="w-full h-12 mb-4">
         <button
           type="button"
-          disabled={!isLoggedIn}
+          disabled={!isLoggedIn || campaignButtonLoading}
           onClick={handleCreateCampaign}
-          className={`px-4 py-2 rounded ${
-            isLoggedIn
-              ? "bg-blue-500 text-white hover:bg-blue-700"
-              : "bg-gray-500 text-gray-400 cursor-not-allowed"
+          className={`px-4 py-2 rounded flex items-center ${
+            !isLoggedIn || campaignButtonLoading
+              ? "bg-gray-500 text-gray-400 cursor-not-allowed"
+              : "bg-blue-500 text-white hover:bg-blue-700"
           }`}
         >
           <FontAwesomeIcon icon={faPlus} className="mr-2" />
-          Create Campaign
+          {campaignButtonLoading ? "Loading..." : "Create Campaign"}
         </button>
       </div>
       <div className="text-center">
         <h1 className="text-3xl font-bold mb-5">All Campaigns</h1>
-        {campaigns.length === 0 && !loading ? (
+        {campaigns && campaigns.length === 0 && !loading ? (
           <p>No campaigns found.</p>
         ) : (
           <div>
@@ -432,10 +440,17 @@ const AllCampaigns = () => {
                             </p>
                           </div>
                           <button
-                            onClick={() => handleCampaign(campaign.id)}
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mt-4 rounded-xl focus:outline-none focus:shadow-outline w-full"
+                            onClick={() => handleButtonClick(campaign.id)}
+                            disabled={buttonLoading[campaign.id]}
+                            className={`bg-blue-500 text-white px-4 py-2 rounded mt-2 hover:bg-blue-700 ${
+                              buttonLoading[campaign.id]
+                                ? "opacity-50 cursor-not-allowed"
+                                : ""
+                            }`}
                           >
-                            View Details
+                            {buttonLoading[campaign.id]
+                              ? "Loading..."
+                              : "View Details"}
                           </button>
                         </div>
                       </div>

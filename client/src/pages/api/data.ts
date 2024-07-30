@@ -4,6 +4,8 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 interface CompanyFormData {
   name: string;
+  password: string;
+  walletAddress: string;
   icNumber: string;
   email: string;
   phoneNumber?: string;
@@ -21,19 +23,22 @@ export default async function handler(
       const formData: CompanyFormData = req.body;
 
       const query = `
-        INSERT INTO users (name, ic_number, email, phone_number, address, profile_image_url, ic_image_url, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, "Pending")
+        INSERT INTO users (name, password, wallet_address, ic_number, email, phone_number, address, profile_image_url, ic_image_url, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, "Pending")
       `;
 
       const connection = await pool.getConnection();
       const [result] = await connection.query<ResultSetHeader>(query, [
         formData.name,
+        formData.password,
+        formData.walletAddress,
         formData.icNumber,
         formData.email,
         formData.phoneNumber || null,
         formData.address || null,
         formData.profileImageUrl || null,
         formData.icImageUrl || null,
+        "Pending",
       ]);
       connection.release();
 
