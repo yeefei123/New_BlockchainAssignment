@@ -7,27 +7,27 @@ interface NavLink {
 
 export const navlinks: NavLink[] = [
   {
-    name: "dashboard",
+    name: "All Campaigns",
     link: "/",
     imgUrl: "/assets/dashboard.svg",
   },
   {
-    name: "expiredCampaign",
+    name: "Expired Campaign",
     link: "/expired-campaign",
     imgUrl: "/assets/menu.svg",
   },
   {
-    name: "fraudCampaign",
+    name: "Fraud Campaign",
     link: "/fraud-campaign",
     imgUrl: "/assets/withdraw.svg",
   },
   {
-    name: "create",
-    link: "/registration-history",
+    name: "Campaign History",
+    link: "/campaign-history",
     imgUrl: "/assets/create-campaign.svg",
   },
   {
-    name: "donationHistory",
+    name: "Donation History",
     link: "/donation-history",
     imgUrl: "/assets/history.svg",
   },

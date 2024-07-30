@@ -116,7 +116,10 @@ const FraudCampaign = () => {
                       <h2 className="text-xl font-bold mb-2">
                         {campaign.campaign_title}
                       </h2>
-                      <p className="text-gray-600">{campaign.funds_raised}</p>
+                      <h2 className="text-xl font-bold mb-2">Funds raised:</h2>
+                      <p className="text-gray-600">
+                        {campaign.funds_raised} ETH
+                      </p>
                     </div>
                     <div className="p-4">
                       <h2 className="text-xl font-bold mb-2">Issue Type:</h2>

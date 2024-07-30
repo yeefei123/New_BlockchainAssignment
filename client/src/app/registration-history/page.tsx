@@ -1,5 +1,7 @@
 "use client";
 
+import { faBackspace } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ethers } from "ethers";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -15,6 +17,8 @@ const web3Modal = new Web3Modal({
 const App = () => {
   const [walletAddress, setWalletAddress] = useState<string>("");
   const [userExists, setUserExists] = useState<boolean>(false);
+  const [pendingUser, setPendingUser] = useState<boolean>(false);
+
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -76,8 +80,8 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const checkUserExists = async () => {
-      if (!walletAddress || !isAccountLoggedIn) {
+    const checkUserStatus = async () => {
+      if (!walletAddress) {
         setLoading(false);
         return;
       }
@@ -89,25 +93,26 @@ const App = () => {
         );
         if (response.ok) {
           const data = await response.json();
+          setUserExists(data.exists);
           if (data.exists) {
-            setUserExists(true);
             setUserData(data.user);
+            setPendingUser(data.user["status"] === "Pending");
           } else {
-            setUserExists(false);
             setUserData(null);
+            setPendingUser(false);
           }
         } else {
           console.error("Failed to fetch user data");
         }
       } catch (error) {
-        console.error("Error checking user:", error);
+        console.error("Error checking user status:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    checkUserExists();
-  }, [walletAddress, isAccountLoggedIn]);
+    checkUserStatus();
+  }, [walletAddress]);
 
   const handleCreateCampaign = () => {
     router.push("/create-campaign");
@@ -129,8 +134,7 @@ const App = () => {
       }
 
       const data = await response.json();
-
-      if (data.exists) {
+      if (data.exists && data.user["status"] !== "Pending") {
         const passwordResponse = await fetch("/api/checkUsers", {
           method: "POST",
           headers: {
@@ -146,7 +150,9 @@ const App = () => {
           setPasswordError("Incorrect password. Please try again.");
         }
       } else {
-        setPasswordError("No user found with the provided wallet address.");
+        setPasswordError(
+          "No user found with the provided wallet address. If you have applied for a campaign, please wait for admin to approve."
+        );
       }
       setLoading(false);
     } catch (error) {
@@ -158,6 +164,16 @@ const App = () => {
 
   return (
     <div className="flex flex-col mt-5 justify-center items-center min-h-screen pt-5">
+      <div className="w-full h-12 mb-4">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl focus:outline-none focus:shadow-outline"
+        >
+          <FontAwesomeIcon icon={faBackspace} className="mr-2" />
+          Back
+        </button>
+      </div>
       <h1 className="text-4xl font-bold mb-6">Company Registration History</h1>
       {loading ? (
         <div className="mt-2 flex mb-5 justify-center items-center">
@@ -187,6 +203,8 @@ const App = () => {
         <p className="text-red-500">Please connect your MetaMask wallet.</p>
       ) : !isLoggedIn ? (
         <p className="text-red-500">Please log in to continue.</p>
+      ) : pendingUser ? (
+        <p className="text-red-500">Application is pending.</p>
       ) : !isAccountLoggedIn ? (
         <div className="bg-white p-4 text-black rounded shadow mb-4 max-w-3xl w-full">
           <h2 className="text-lg font-semibold mb-2">Login</h2>

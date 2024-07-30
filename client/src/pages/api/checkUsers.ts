@@ -1,4 +1,5 @@
 import pool from "@/app/utils/db";
+import bcrypt from "bcrypt";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
@@ -16,17 +17,24 @@ export default async function handler(
 
     try {
       const query = `
-        SELECT * FROM users WHERE wallet_address = ? AND password = ?
+        SELECT password FROM users WHERE wallet_address = ?
       `;
 
       const connection = await pool.getConnection();
-      const [rows] = await connection.query(query, [walletAddress, password]);
+      const [rows] = await connection.query(query, [walletAddress]);
       connection.release();
 
       if (Array.isArray(rows) && rows.length > 0) {
-        res.status(200).json({ success: true });
+        const hashedPassword = rows[0].password;
+        const isMatch = await bcrypt.compare(password, hashedPassword);
+
+        if (isMatch) {
+          res.status(200).json({ success: true });
+        } else {
+          res.status(401).json({ error: "Incorrect password." });
+        }
       } else {
-        res.status(401).json({ error: "Incorrect password." });
+        res.status(404).json({ error: "User not found." });
       }
     } catch (error) {
       console.error("Error during login:", error);

@@ -68,7 +68,8 @@ const CheckUserPage = () => {
           if (data.exists && data.status === "Accepted") {
             setAuthToken("client_auth_token");
             router.push("/create-campaign");
-          } else {
+          }
+          if (!data.exists) {
             setAuthToken("client_auth_token");
             router.push("/company-registration");
           }

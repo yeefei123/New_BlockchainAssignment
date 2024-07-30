@@ -1,12 +1,10 @@
 "use client";
 
-import { faBackward } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import bcrypt from "bcryptjs";
 import { ethers } from "ethers";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getAuthToken } from "../utils/auth";
 
 const CompanyRegistrationPage = (props: any) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -77,18 +75,18 @@ const CompanyRegistrationPage = (props: any) => {
     setLoading(false);
   };
 
-  useEffect(() => {
-    const checkAuth = () => {
-      const token = getAuthToken();
-      if (!token) {
-        router.push("/");
-      } else {
-        setLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   const checkAuth = () => {
+  //     const token = getAuthToken();
+  //     if (!token) {
+  //       router.push("/");
+  //     } else {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    checkAuth();
-  }, [router]);
+  //   checkAuth();
+  // }, [router]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -225,7 +223,7 @@ const CompanyRegistrationPage = (props: any) => {
           console.error("Failed to upload IC image:", icJson);
         }
       }
-
+      const hashedPassword = await bcrypt.hash(password, 10);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
       const signer = await provider.getSigner();
@@ -233,7 +231,7 @@ const CompanyRegistrationPage = (props: any) => {
 
       const formData = {
         name,
-        password,
+        password: hashedPassword,
         walletAddress,
         icNumber,
         email,
@@ -242,7 +240,6 @@ const CompanyRegistrationPage = (props: any) => {
         ...uploadedImages,
       };
 
-      console.log(formData);
       const response = await fetch("/api/data", {
         method: "POST",
         headers: {
@@ -321,81 +318,189 @@ const CompanyRegistrationPage = (props: any) => {
     <div>
       {isLoggedIn ? (
         <>
-          {userExists ? (
+          {!userExists ? (
             <>
-              <div className="w-full h-12 mb-4">
-                <div className="flex items-center">
-                  <FontAwesomeIcon
-                    icon={faBackward}
-                    onClick={() => router.push("/")}
-                    className="cursor-pointer"
-                  />
-                  <h1 className="text-lg font-semibold">
-                    Company Registration
-                  </h1>
-                </div>
-              </div>
-              <form
-                onSubmit={handleSubmit}
-                className="flex flex-col w-full max-w-md mx-auto"
-              >
-                {/* Form fields */}
-                <div className="mb-4">
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Company Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 sm:text-sm"
-                  />
-                  {errors.name && (
-                    <p className="text-red-500 text-sm">{errors.name}</p>
-                  )}
-                </div>
-                {/* Add other form fields similarly */}
-                <div className="mb-4">
-                  <label
-                    htmlFor="profileImage"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Profile Image
-                  </label>
-                  <input
-                    type="file"
-                    id="profileImage"
-                    onChange={handleProfileImageChange}
-                    className="mt-1 block w-full"
-                  />
-                  {profileImageUrl && (
-                    <Image
-                      src={profileImageUrl}
-                      alt="Profile Preview"
-                      width={100}
-                      height={100}
-                      className="mt-2"
-                    />
-                  )}
-                  {errors.profileImage && (
-                    <p className="text-red-500 text-sm">
-                      {errors.profileImage}
-                    </p>
-                  )}
-                </div>
-                {/* Similarly, add fields for IC image, etc. */}
-                <button
-                  type="submit"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  disabled={loading}
+              <div className="campaigns-container flex flex-col justify-center items-center">
+                <h1 className="text-4xl font-bold mb-6">Registration</h1>
+                <form
+                  className="w-full bg-gray-500 item-center flex justify-center shadow-md rounded px-8 pt-6 pb-8 mb-4"
+                  onSubmit={handleSubmit}
                 >
-                  {loading ? "Submitting..." : "Submit"}
-                </button>
-              </form>
+                  <div className="flex flex-col w-3/4 bg-black shadow-md rounded px-8 pt-6 pb-8 mb-4">
+                    <div className="mb-4">
+                      <label className="block text-white text-sm font-bold mb-2">
+                        Full Name:
+                      </label>
+                      <input
+                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+                          errors.name && "border-red-500"
+                        }`}
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                      />
+                      {errors.name && (
+                        <p className="text-red-500 text-xs italic">
+                          {errors.name}
+                        </p>
+                      )}
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-white text-sm font-bold mb-2">
+                        Password:
+                      </label>
+                      <input
+                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+                          errors.password && "border-red-500"
+                        }`}
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                      {errors.password && (
+                        <p className="text-red-500 text-xs italic">
+                          {errors.password}
+                        </p>
+                      )}
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-white text-sm font-bold mb-2">
+                        Email:
+                      </label>
+                      <input
+                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+                          errors.email && "border-red-500"
+                        }`}
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
+                      {errors.email && (
+                        <p className="text-red-500 text-xs italic">
+                          {errors.email}
+                        </p>
+                      )}
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-white text-sm font-bold mb-2">
+                        IC Number:
+                      </label>
+                      <input
+                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+                          errors.icNumber && "border-red-500"
+                        }`}
+                        type="text"
+                        value={icNumber}
+                        onChange={(e) => setIcNumber(e.target.value)}
+                      />
+                      {errors.icNumber && (
+                        <p className="text-red-500 text-xs italic">
+                          {errors.icNumber}
+                        </p>
+                      )}
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-white text-sm font-bold mb-2">
+                        Phone Number:
+                      </label>
+                      <input
+                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+                          errors.phoneNumber && "border-red-500"
+                        }`}
+                        type="text"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                      />
+                      {errors.phoneNumber && (
+                        <p className="text-red-500 text-xs italic">
+                          {errors.phoneNumber}
+                        </p>
+                      )}
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-white text-sm font-bold mb-2">
+                        Address:
+                      </label>
+                      <textarea
+                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+                          errors.address && "border-red-500"
+                        }`}
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                      />
+                      {errors.address && (
+                        <p className="text-red-500 text-xs italic">
+                          {errors.address}
+                        </p>
+                      )}
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-white text-sm font-bold mb-2">
+                        Profile Image:
+                      </label>
+                      <input
+                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+                          errors.profileImage && "border-red-500"
+                        }`}
+                        type="file"
+                        onChange={handleProfileImageChange}
+                      />
+                      {profileImage && (
+                        <Image
+                          className="w-24 h-24 mt-2 rounded-full"
+                          src={profileImageUrl}
+                          alt="Profile"
+                          width={100}
+                          height={100}
+                        />
+                      )}
+                      {errors.profileImage && (
+                        <p className="text-red-500 text-xs italic">
+                          {errors.profileImage}
+                        </p>
+                      )}
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-white text-sm font-bold mb-2">
+                        IC Image:
+                      </label>
+                      <input
+                        className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+                          errors.icImage && "border-red-500"
+                        }`}
+                        type="file"
+                        onChange={handleIcImageChange}
+                      />
+                      {icImage && (
+                        <Image
+                          className="w-24 h-24 mt-2 rounded-full"
+                          src={icImageUrl}
+                          alt="IC"
+                          width={100}
+                          height={100}
+                        />
+                      )}
+                      {errors.icImage && (
+                        <p className="text-red-500 text-xs italic">
+                          {errors.icImage}
+                        </p>
+                      )}
+                    </div>
+                    <div className="mb-4">
+                      <button
+                        className={`bg-blue-500 w-full hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
+                          loading ||
+                          (!isFormValid && "opacity-50 cursor-not-allowed")
+                        }`}
+                        type="submit"
+                        disabled={loading || !isFormValid}
+                      >
+                        {loading ? "Loading..." : "Register"}
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
             </>
           ) : (
             <div className="w-full h-screen flex flex-col items-center justify-center">
