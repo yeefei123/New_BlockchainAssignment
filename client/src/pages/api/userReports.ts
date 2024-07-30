@@ -57,8 +57,9 @@ export default async function handler(
       } else if (status === "resolved") {
         query += ` WHERE status = 'Resolved'`;
       } else {
-        res.status(400).json({ error: "Invalid status query parameter" });
-        return;
+        return res
+          .status(400)
+          .json({ error: "Invalid status query parameter" });
       }
 
       const connection = await pool.getConnection();
@@ -68,12 +69,9 @@ export default async function handler(
       );
       connection.release();
 
+      // Return null if no rows are found
       if (rows.length === 0) {
-        const message =
-          status === "pending"
-            ? "No pending reports found"
-            : "No resolved reports found";
-        return res.status(404).json({ message });
+        return res.status(200).json(null);
       }
 
       res.status(200).json(rows);

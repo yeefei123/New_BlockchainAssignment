@@ -97,23 +97,26 @@ const AllCampaigns = () => {
   useEffect(() => {
     const fetchResolvedReports = async () => {
       try {
-        const response = await fetch("/api/userReports?status=resolved");
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
+        const response = await fetch("/api/userReports?status=pending");
+        if (response.ok) {
+          const data: Report[] = await response.json();
+          if (data) {
+            setResolvedReports(data);
+            setReportsLoaded(true);
+          }
+        } else {
+          alert("Failed to fetch data");
         }
-        const data: Report[] = await response.json();
-        setResolvedReports(data);
-        setReportsLoaded(true); // Mark reports as loaded
       } catch (error) {
         console.error("Error fetching resolved reports:", error);
       }
     };
 
     fetchResolvedReports();
-  }, []); // Empty dependency array means this runs once on mount
+  }, []);
 
   useEffect(() => {
-    if (!reportsLoaded) return; // Only run this effect if reports are loaded
+    if (!reportsLoaded) return;
 
     const fetchCampaigns = async () => {
       try {

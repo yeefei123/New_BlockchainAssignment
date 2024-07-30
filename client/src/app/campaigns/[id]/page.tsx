@@ -108,6 +108,22 @@ const CampaignDetails: React.FC = () => {
       setLoading(false);
     }
   };
+  const calculateDaysLeft = (endDate: Date) => {
+    const today = new Date();
+    const timeDiff = endDate.getTime() - today.getTime();
+
+    if (timeDiff <= 0) {
+      return "Expired";
+    }
+
+    const daysLeft = Math.floor(timeDiff / (1000 * 3600 * 24));
+    const hoursLeft = Math.floor(
+      (timeDiff % (1000 * 3600 * 24)) / (1000 * 3600)
+    );
+    const minutesLeft = Math.floor((timeDiff % (1000 * 3600)) / (1000 * 60));
+
+    return `${daysLeft} days, ${hoursLeft} hours, and ${minutesLeft} minutes left`;
+  };
 
   const getCurrentMilestone = (milestones: any[]) => {
     const now = new Date();
@@ -120,7 +136,7 @@ const CampaignDetails: React.FC = () => {
       const endDate = ethers.BigNumber.isBigNumber(milestone.endDate)
         ? new Date(milestone.endDate.toNumber())
         : new Date(milestone.endDate);
-      console.log(startDate);
+      console.log("Now", now, "End Date", endDate, "Start Date", startDate);
       if (now >= startDate && now <= endDate) {
         return milestone;
       }
@@ -348,7 +364,7 @@ const CampaignDetails: React.FC = () => {
         fileUpload: null,
         issueType: issueType,
       };
-
+      console.log(formData);
       try {
         const response = await fetch("/api/userReports", {
           method: "POST",
@@ -359,7 +375,7 @@ const CampaignDetails: React.FC = () => {
         });
 
         if (response.ok) {
-          const data = await response.json();
+          await response.json();
           alert("Report submitted successfully.");
         } else {
           alert("Failed to submit report.");

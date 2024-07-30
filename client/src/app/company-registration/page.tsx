@@ -278,14 +278,14 @@ const CompanyRegistrationPage = (props: any) => {
         const data = await response.json();
         if (data.exist()) {
           setUserExists(true);
-          // if (data.status === "Pending") {
-          //   setUserStatus("Pending");
-          // } else if (data.status === "Accepted") {
-          //   setUserStatus("Accepted");
-          // } else {
-          //   setUserStatus("Rejected");
-          // }
-          // console.log(userStatus);
+          if (data.user["status"] === "Pending") {
+            setUserStatus("Pending");
+          } else if (data.user["status"] === "Accepted") {
+            setUserStatus("Accepted");
+          } else {
+            setUserStatus("Rejected");
+          }
+          console.log(userStatus);
           return true;
         } else {
           setUserExists(false);
@@ -318,7 +318,7 @@ const CompanyRegistrationPage = (props: any) => {
     <div>
       {isLoggedIn ? (
         <>
-          {!userExists ? (
+          {!userExists && userStatus === "Approved" ? (
             <>
               <div className="campaigns-container flex flex-col justify-center items-center">
                 <h1 className="text-4xl font-bold mb-6">Registration</h1>

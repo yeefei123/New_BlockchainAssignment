@@ -65,11 +65,11 @@ const CheckUserPage = () => {
         if (response.ok) {
           const data = await response.json();
           setLoading(false);
-          if (data.exists && data.status === "Accepted") {
+          if (data.exists && data.user["status"] === "Accepted") {
             setAuthToken("client_auth_token");
             router.push("/create-campaign");
           }
-          if (!data.exists) {
+          if (!data.exists || data.user["status"] === "Pending") {
             setAuthToken("client_auth_token");
             router.push("/company-registration");
           }
