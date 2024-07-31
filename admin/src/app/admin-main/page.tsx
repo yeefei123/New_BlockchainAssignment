@@ -89,6 +89,7 @@ const AdminMainPage = () => {
 
       if (response.ok) {
         const jsonData = await response.json();
+        console.log(jsonData);
         setData(jsonData);
       } else {
         alert("Failed to fetch data");
@@ -440,11 +441,34 @@ const FraudCase = ({
                 {data.map((item, index) => (
                   <tr key={index} className="border-b">
                     <td className="py-2 px-4">{item.issue_type}</td>
-                    <td className="py-2 px-4">{item.campaign_title}</td>
-                    <td className="py-2 px-4">
+                    <td
+                      className="py-2 px-4"
+                      style={{
+                        maxWidth: "50px",
+                        wordWrap: "break-word",
+                        wordBreak: "break-word",
+                      }}
+                    >
+                      {item.campaign_title}
+                    </td>
+                    <td
+                      className="py-2 px-4"
+                      style={{
+                        maxWidth: "200px",
+                        wordWrap: "break-word",
+                        wordBreak: "break-word",
+                      }}
+                    >
                       {item.file_url ? item.file_url : "-"}
                     </td>
-                    <td className="py-2 px-4">
+                    <td
+                      className="py-2 px-4"
+                      style={{
+                        maxWidth: "100px",
+                        wordWrap: "break-word",
+                        wordBreak: "break-word",
+                      }}
+                    >
                       {item.campaign_owner ? item.campaign_owner : "-"}
                     </td>
                     <td className="py-2 px-4">

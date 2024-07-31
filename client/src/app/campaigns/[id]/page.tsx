@@ -91,7 +91,6 @@ const CampaignDetails: React.FC = () => {
       const milestonesArray = Array.isArray(fetchedMilestones)
         ? fetchedMilestones
         : Object.values(fetchedMilestones);
-      console.log(fetchedMilestones);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const accounts = await provider.listAccounts();
       // setWalletAddress(address);
@@ -145,7 +144,6 @@ const CampaignDetails: React.FC = () => {
 
   const currentMilestone = getCurrentMilestone(milestones);
   const router = useRouter();
-  console.log(currentMilestone);
   const handleOpenDialog = (milestoneId: number) => {
     setSelectedMilestoneId(milestoneId);
     setIsDialogOpen(true);
@@ -355,6 +353,7 @@ const CampaignDetails: React.FC = () => {
   };
   const handleReport = async (issueType: string) => {
     if (currentMilestone && campaign) {
+      console.log(currentMilestone);
       const formData = {
         campaignId: campaign.id,
         title: campaign.title,
@@ -364,9 +363,10 @@ const CampaignDetails: React.FC = () => {
         )
           .toFixed(2)
           .toString(),
-        fileUpload: null,
+        fileUpload: currentMilestone.documentURL,
         issueType: issueType,
       };
+
       console.log(formData);
       try {
         const response = await fetch("/api/userReports", {
