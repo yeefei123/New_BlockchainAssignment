@@ -73,17 +73,21 @@ const CreateMilestonesPage = () => {
   };
 
   const getTodayDate = () => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = (today.getMonth() + 1).toString().padStart(2, "0");
-    const day = today.getDate().toString().padStart(2, "0");
-    return `${year}-${month}-${day}`;
+    const now = new Date();
+    now.setSeconds(0, 0); // Remove seconds and milliseconds
+    return now.toISOString().slice(0, 16);
   };
 
-  const addDays = (date: string, days: number) => {
-    const result = new Date(date);
-    result.setDate(result.getDate() + days);
-    return result.toISOString().split("T")[0];
+  const addDays = (dateString: string, days: number) => {
+    const date = new Date(dateString);
+    date.setDate(date.getDate() + days);
+    return date.toISOString().slice(0, 16);
+  };
+
+  const getMinStartDate = (index: number) => {
+    if (index === 0) return getTodayDate();
+    const prevEndDate = localMilestones[index - 1]?.endDate;
+    return prevEndDate ? addDays(prevEndDate, 3) : getTodayDate();
   };
 
   const validateStep = () => {
@@ -138,7 +142,7 @@ const CreateMilestonesPage = () => {
   };
 
   const handleNext = () => {
-    const { valid, errors } = validateStep();
+    const { valid } = validateStep();
     if (!valid) {
       console.log(errors);
       return;
@@ -161,14 +165,6 @@ const CreateMilestonesPage = () => {
     setMilestonesData(localMilestones);
     router.push("/create-campaign");
   };
-
-  const getMinStartDate = (index: number) => {
-    if (index === 0) return getTodayDate();
-    const prevEndDate = localMilestones[index - 1].endDate;
-    return addDays(prevEndDate, 3);
-  };
-
-  const todayDate = getTodayDate();
 
   return (
     <div>
@@ -259,7 +255,7 @@ const CreateMilestonesPage = () => {
               Start Date
             </label>
             <input
-              type="date"
+              type="datetime-local"
               id="startDate"
               value={localMilestones[currentStep]?.startDate || ""}
               min={getMinStartDate(currentStep)}
@@ -283,10 +279,10 @@ const CreateMilestonesPage = () => {
               End Date
             </label>
             <input
-              type="date"
+              type="datetime-local"
               id="endDate"
-              min={localMilestones[currentStep]?.startDate}
               value={localMilestones[currentStep]?.endDate || ""}
+              min={localMilestones[currentStep]?.startDate || getTodayDate()}
               onChange={(e) => handleFormFieldChange("endDate", e.target.value)}
               className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
                 errors.endDate && "border-red-500"
@@ -298,22 +294,20 @@ const CreateMilestonesPage = () => {
           </div>
 
           <div className="flex justify-between">
-            {currentStep > 0 && (
-              <button
-                type="button"
-                onClick={handlePrev}
-                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              >
-                Previous
-              </button>
-            )}
-
+            <button
+              type="button"
+              onClick={handlePrev}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              disabled={currentStep === 0}
+            >
+              Previous
+            </button>
             <button
               type="button"
               onClick={handleNext}
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             >
-              {currentStep < milestonesCount - 1 ? "Next" : "Submit"}
+              {currentStep === milestonesCount - 1 ? "Finish" : "Next"}
             </button>
           </div>
         </form>

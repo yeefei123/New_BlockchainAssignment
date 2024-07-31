@@ -3,7 +3,7 @@ import React, { useRef, useState } from "react";
 interface FileUploadDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpload: (file: File) => void;
+  onUpload: (file: File) => Promise<void>; // Changed to return a Promise
 }
 
 const FileUploadDialog: React.FC<FileUploadDialogProps> = ({
@@ -13,6 +13,7 @@ const FileUploadDialog: React.FC<FileUploadDialogProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState(false); // Loading state
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -20,11 +21,15 @@ const FileUploadDialog: React.FC<FileUploadDialogProps> = ({
     }
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (selectedFile) {
-      onUpload(selectedFile);
-      setSelectedFile(null);
-      onClose();
+      setIsLoading(true); // Set loading to true
+      try {
+        await onUpload(selectedFile);
+      } finally {
+        setSelectedFile(null);
+        setIsLoading(false); // Set loading to false after upload is complete
+      }
     }
   };
 
@@ -53,14 +58,18 @@ const FileUploadDialog: React.FC<FileUploadDialogProps> = ({
           <button
             className="px-4 py-2 mr-2 bg-gray-500 text-white rounded hover:bg-gray-700 focus:outline-none"
             onClick={handleCancel}
+            disabled={isLoading} // Disable cancel button during upload
           >
             Cancel
           </button>
           <button
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 focus:outline-none"
+            className={`px-4 py-2 text-white rounded focus:outline-none ${
+              isLoading ? "bg-gray-500" : "bg-blue-500 hover:bg-blue-700"
+            }`}
             onClick={handleUpload}
+            disabled={isLoading}
           >
-            Upload
+            {isLoading ? "Uploading..." : "Upload"}
           </button>
         </div>
       </div>

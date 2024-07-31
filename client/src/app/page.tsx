@@ -97,11 +97,16 @@ const AllCampaigns = () => {
   useEffect(() => {
     const fetchResolvedReports = async () => {
       try {
-        const response = await fetch("/api/userReports?status=pending");
+        const response = await fetch("/api/userReports?status=resolved");
+        console.log(response);
         if (response.ok) {
           const data: Report[] = await response.json();
-          if (data) {
+          console.log(data);
+          if (data !== null || undefined) {
             setResolvedReports(data);
+            setReportsLoaded(true);
+          } else {
+            setResolvedReports([]);
             setReportsLoaded(true);
           }
         } else {
@@ -146,9 +151,14 @@ const AllCampaigns = () => {
           })
         );
 
-        const filteredCampaigns = campaignData.filter((campaign) =>
-          resolvedReports.filter((report) => report.campaign_id === campaign.id)
+        const filteredCampaigns = campaignData.filter(
+          (campaign) =>
+            !resolvedReports.some(
+              (report) => report.campaign_id === campaign.id
+            )
         );
+
+        console.log(filteredCampaigns);
         setCampaigns(filteredCampaigns);
       } catch (error) {
         console.error("Error fetching campaigns:", error);

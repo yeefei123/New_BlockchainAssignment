@@ -23,6 +23,8 @@ const web3Modal = new Web3Modal({
 const CampaignDetails: React.FC = () => {
   const { id } = useParams();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [targetAchived, setTargetAchived] = useState<boolean>(false);
+
   const [walletAddress, setWalletAddress] = useState<string>("");
   const [campaign, setCampaign] = useState<any>(null);
   const [donationAmount, setDonationAmount] = useState<string | number>("");
@@ -89,8 +91,7 @@ const CampaignDetails: React.FC = () => {
       const milestonesArray = Array.isArray(fetchedMilestones)
         ? fetchedMilestones
         : Object.values(fetchedMilestones);
-
-      // Initialize Web3 and get wallet address
+      console.log(fetchedMilestones);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const accounts = await provider.listAccounts();
       // setWalletAddress(address);
@@ -127,7 +128,6 @@ const CampaignDetails: React.FC = () => {
 
   const getCurrentMilestone = (milestones: any[]) => {
     const now = new Date();
-    now.setHours(0, 0, 0, 0);
 
     for (const milestone of milestones) {
       const startDate = ethers.BigNumber.isBigNumber(milestone.startDate)
@@ -136,7 +136,6 @@ const CampaignDetails: React.FC = () => {
       const endDate = ethers.BigNumber.isBigNumber(milestone.endDate)
         ? new Date(milestone.endDate.toNumber())
         : new Date(milestone.endDate);
-      console.log("Now", now, "End Date", endDate, "Start Date", startDate);
       if (now >= startDate && now <= endDate) {
         return milestone;
       }
@@ -146,7 +145,7 @@ const CampaignDetails: React.FC = () => {
 
   const currentMilestone = getCurrentMilestone(milestones);
   const router = useRouter();
-
+  console.log(currentMilestone);
   const handleOpenDialog = (milestoneId: number) => {
     setSelectedMilestoneId(milestoneId);
     setIsDialogOpen(true);
@@ -279,20 +278,24 @@ const CampaignDetails: React.FC = () => {
           Crowdfunding.abi,
           signer
         );
+
         if (documentURL && selectedMilestoneId !== null) {
-          await contract.updateMilestoneDocument(
+          const sendingDocs = await contract.updateMilestoneDocument(
             selectedMilestoneId,
             documentURL
           );
+
+          // Wait for the transaction to be mined
+          await sendingDocs.wait();
+
           alert("Document uploaded and milestone updated successfully!");
           setUploadedMilestones(
             (prev) => new Set(prev.add(selectedMilestoneId))
           );
+          handleCloseDialog();
         }
       } catch (error) {
         console.error("Error uploading file:", error);
-      } finally {
-        handleCloseDialog();
       }
     }
   };
@@ -411,7 +414,9 @@ const CampaignDetails: React.FC = () => {
 
       const current = ethers.utils.parseEther(currentString);
       const target = ethers.utils.parseEther(targetString);
-
+      if (current === target) {
+        setTargetAchived(true);
+      }
       return current.mul(100).div(target).toNumber();
     } catch (error) {
       console.error("Error calculating progress:", error);
@@ -524,7 +529,12 @@ const CampaignDetails: React.FC = () => {
       <div className="bg-white shadow-lg rounded-lg p-6">
         <div className="flex flex-row justify-between">
           <button
-            className="px-4 border outline outline-offset-2 outline-2 py-2 text-black bg-white-500 rounded hover:bg-white-700 focus:outline-none"
+            disabled={!currentMilestone}
+            className={`bg-blue-500 text-white p-2 rounded-xl ${
+              !currentMilestone
+                ? "bg-gray-500 cursor-not-allowed"
+                : "hover:bg-blue-700"
+            }`}
             onClick={() => setIsReportDialogOpen(true)}
           >
             <FontAwesomeIcon
@@ -603,12 +613,20 @@ const CampaignDetails: React.FC = () => {
                 />
                 <button
                   className={`bg-blue-500 text-white p-2 rounded-xl ${
-                    buttonLoading || !isLoggedIn || !walletAddress
+                    buttonLoading ||
+                    !isLoggedIn ||
+                    !walletAddress ||
+                    !targetAchived
                       ? "bg-gray-500 cursor-not-allowed"
                       : "hover:bg-blue-700"
                   }`}
                   onClick={() => handleDonate(currentMilestone.id)}
-                  disabled={buttonLoading || !isLoggedIn || !walletAddress}
+                  disabled={
+                    buttonLoading ||
+                    !isLoggedIn ||
+                    !walletAddress ||
+                    !targetAchived
+                  }
                 >
                   {buttonLoading ? "Donating ..." : "Donate To This Milestone"}
                 </button>
@@ -645,8 +663,7 @@ const CampaignDetails: React.FC = () => {
                 !isCompleted ||
                 hasUploaded ||
                 new Date() < new Date(currentMilestone.startDate) ||
-                milestone[index - 1].status !== "Completed" ||
-                milestone.fileUrl;
+                milestone.documentURL;
 
               return (
                 <div key={index} className="mb-4 text-black">
@@ -664,19 +681,13 @@ const CampaignDetails: React.FC = () => {
                               : "bg-blue-500 text-white hover:bg-blue-700"
                           }`}
                           onClick={() => handleOpenDialog(milestone.id)}
-                          disabled={isButtonDisabled}
+                          disabled={isButtonDisabled || milestone.fileUrl}
                         >
                           Upload Document
                         </button>
                       )}
                   </div>
-                  <FileUploadDialog
-                    isOpen={
-                      isDialogOpen && selectedMilestoneId === milestone.id
-                    }
-                    onClose={handleCloseDialog}
-                    onUpload={handleUpload}
-                  />
+
                   <h3 className="font-bold">{milestone.title}</h3>
                   <p>{milestone.milestonedescription}</p>
                   <div>
@@ -706,12 +717,20 @@ const CampaignDetails: React.FC = () => {
                       ${parseFloat(formatEther(milestone.targetAmt)).toFixed(2)}
                     </div>
                   </div>
+                  <FileUploadDialog
+                    isOpen={
+                      isDialogOpen && selectedMilestoneId === milestone.id
+                    }
+                    onClose={handleCloseDialog}
+                    onUpload={handleUpload}
+                  />
                 </div>
               );
             })}
           </ul>
         </div>
       </div>
+
       {isReportDialogOpen && (
         <ReportDialog
           isOpen={isReportDialogOpen}
