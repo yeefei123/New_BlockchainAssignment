@@ -114,9 +114,10 @@ const AdminMainPage = () => {
     <div>
       {auth ? (
         <div
-          className="flex flex-col text-black items-center pt-5 bg-cover h-screen bg-no-repeat bg-center"
+          className="flex flex-col text-black items-center pt-5 bg-cover h-full min-h-screen bg-no-repeat bg-center"
           style={{
             backgroundImage: `url('/img/images.jpeg')`,
+            backgroundSize: "cover",
           }}
         >
           <div className="flex justify-end items-center w-full px-6">

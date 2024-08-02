@@ -69,7 +69,11 @@ const CheckUserPage = () => {
             setAuthToken("client_auth_token");
             router.push("/create-campaign");
           }
-          if (!data.exists || data.user["status"] === "Pending") {
+          if (
+            !data.exists ||
+            data.user["status"] === "Pending" ||
+            data.user["status"] === "Rejected"
+          ) {
             setAuthToken("client_auth_token");
             router.push("/company-registration");
           }

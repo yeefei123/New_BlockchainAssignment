@@ -276,19 +276,17 @@ const CompanyRegistrationPage = (props: any) => {
 
       if (response.ok) {
         const data = await response.json();
-        if (data.exist()) {
+        console.log(data.length);
+        if (data.length > 0) {
           setUserExists(true);
-          if (data.user["status"] === "Pending") {
+          if (data[0].status === "Pending") {
             setUserStatus("Pending");
-          } else if (data.user["status"] === "Accepted") {
-            setUserStatus("Accepted");
-          } else {
-            setUserStatus("Rejected");
           }
           console.log(userStatus);
           return true;
         } else {
-          setUserExists(false);
+          console.log("No data");
+          setUserExists(true);
           return false;
         }
       } else {
@@ -302,7 +300,6 @@ const CompanyRegistrationPage = (props: any) => {
 
   useEffect(() => {
     validateForm();
-    fetchUserReports;
   }, [
     name,
     password,
@@ -314,11 +311,17 @@ const CompanyRegistrationPage = (props: any) => {
     icImage,
   ]);
 
+  useEffect(() => {
+    if (walletAddress) {
+      fetchUserReports(walletAddress);
+    }
+  });
+
   return (
     <div>
       {isLoggedIn ? (
         <>
-          {!userExists && userStatus === "Approved" ? (
+          {userExists && userStatus !== "Pending" ? (
             <>
               <div className="campaigns-container flex flex-col justify-center items-center">
                 <h1 className="text-4xl font-bold mb-6">Registration</h1>
@@ -443,6 +446,7 @@ const CompanyRegistrationPage = (props: any) => {
                           errors.profileImage && "border-red-500"
                         }`}
                         type="file"
+                        accept="image/*"
                         onChange={handleProfileImageChange}
                       />
                       {profileImage && (
@@ -469,6 +473,7 @@ const CompanyRegistrationPage = (props: any) => {
                           errors.icImage && "border-red-500"
                         }`}
                         type="file"
+                        accept="image/*"
                         onChange={handleIcImageChange}
                       />
                       {icImage && (

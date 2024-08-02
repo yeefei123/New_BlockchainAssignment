@@ -94,10 +94,10 @@ const App = () => {
           setUserExists(data.exists);
           if (data.exists) {
             setUserData(data.user);
-            setPendingUser(data.user["status"] === "Pending");
+            // setPendingUser(data.user["status"] === "Pending");
           } else {
             setUserData(null);
-            setPendingUser(false);
+            // setPendingUser(false);
           }
         } else {
           console.error("Failed to fetch user data");
@@ -132,7 +132,7 @@ const App = () => {
       }
 
       const data = await response.json();
-      if (data.exists && data.user["status"] !== "Pending") {
+      if (data.exists) {
         const passwordResponse = await fetch("/api/checkUsers", {
           method: "POST",
           headers: {
@@ -191,8 +191,6 @@ const App = () => {
         <p className="text-red-500">Please connect your MetaMask wallet.</p>
       ) : !isLoggedIn ? (
         <p className="text-red-500">Please log in to continue.</p>
-      ) : pendingUser ? (
-        <p className="text-red-500">Application is pending.</p>
       ) : !isAccountLoggedIn ? (
         <div className="bg-white p-4 text-black rounded shadow mb-4 max-w-3xl w-full">
           <h2 className="text-lg font-semibold mb-2">Login</h2>

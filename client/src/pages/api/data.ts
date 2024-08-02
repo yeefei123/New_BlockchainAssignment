@@ -21,35 +21,80 @@ export default async function handler(
   if (req.method === "POST") {
     try {
       const formData: CompanyFormData = req.body;
-
-      const query = `
-        INSERT INTO users (name, password, wallet_address, ic_number, email, phone_number, address, profile_image_url, ic_image_url, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, "Pending")
-      `;
+      const { walletAddress } = formData;
 
       const connection = await pool.getConnection();
-      const [result] = await connection.query<ResultSetHeader>(query, [
-        formData.name,
-        formData.password,
-        formData.walletAddress,
-        formData.icNumber,
-        formData.email,
-        formData.phoneNumber || null,
-        formData.address || null,
-        formData.profileImageUrl || null,
-        formData.icImageUrl || null,
-        "Pending",
-      ]);
-      connection.release();
 
-      const insertId = result.insertId;
+      // Check if the wallet_address already exists
+      const checkQuery = `
+        SELECT COUNT(*) AS count FROM users WHERE wallet_address = ?
+      `;
+      const [checkResult] = await connection.query<RowDataPacket[]>(
+        checkQuery,
+        [walletAddress]
+      );
+      const { count } = checkResult[0];
+
+      let result;
+
+      if (count > 0) {
+        // Update the existing row
+        const updateQuery = `
+          UPDATE users SET 
+            name = ?, 
+            password = ?, 
+            ic_number = ?, 
+            email = ?, 
+            phone_number = ?, 
+            address = ?, 
+            profile_image_url = ?, 
+            ic_image_url = ? ,
+            status = "Pending"
+          WHERE wallet_address = ?
+        `;
+        [result] = await connection.query<ResultSetHeader>(updateQuery, [
+          formData.name,
+          formData.password,
+          formData.icNumber,
+          formData.email,
+          formData.phoneNumber || null,
+          formData.address || null,
+          formData.profileImageUrl || null,
+          formData.icImageUrl || null,
+          walletAddress,
+        ]);
+      } else {
+        // Insert a new row
+        const insertQuery = `
+          INSERT INTO users (name, password, wallet_address, ic_number, email, phone_number, address, profile_image_url, ic_image_url, status)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, "Pending")
+        `;
+        [result] = await connection.query<ResultSetHeader>(insertQuery, [
+          formData.name,
+          formData.password,
+          walletAddress,
+          formData.icNumber,
+          formData.email,
+          formData.phoneNumber || null,
+          formData.address || null,
+          formData.profileImageUrl || null,
+          formData.icImageUrl || null,
+          "Pending",
+        ]);
+      }
+
+      connection.release();
+      const affectedRows = result.affectedRows;
 
       res.status(200).json({
-        message: "Company registered successfully",
-        insertId,
+        message:
+          count > 0
+            ? "Company updated successfully"
+            : "Company registered successfully",
+        affectedRows,
       });
     } catch (error) {
-      console.error("Error registering company:", error);
+      console.error("Error processing request:", error);
       res.status(500).json({ error: "Internal Server Error" });
     }
   } else if (req.method === "GET") {
