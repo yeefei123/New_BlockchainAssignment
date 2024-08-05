@@ -14,6 +14,7 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
   const [selectedIssue, setSelectedIssue] = useState<string | null>(null);
 
   const issues = [
+    "Incomplete Milestone",
     "Inappropriate Content",
     "Duplicate Campaign",
     "Fraudulent Activity",
