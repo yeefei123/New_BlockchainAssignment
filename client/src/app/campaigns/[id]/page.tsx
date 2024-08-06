@@ -591,16 +591,16 @@ const CampaignDetails: React.FC = () => {
                     }}
                   ></div>
                   <div className="absolute  left-0 text-left text-black text-xs p-1">
-                    $
                     {parseFloat(
                       formatEther(currentMilestone.donationAmountCollected)
-                    ).toFixed(2)}
+                    ).toFixed(2)}{" "}
+                    ETH
                   </div>
                   <div className="absolute right-0 text-right text-black text-xs p-1">
-                    $
                     {parseFloat(
                       formatEther(currentMilestone.targetAmt)
-                    ).toFixed(2)}
+                    ).toFixed(2)}{" "}
+                    ETH
                   </div>
                 </div>
 
@@ -708,13 +708,14 @@ const CampaignDetails: React.FC = () => {
                       }}
                     ></div>
                     <div className="absolute left-0 text-left text-black text-xs p-1">
-                      $
                       {parseFloat(
                         formatEther(milestone.donationAmountCollected)
-                      ).toFixed(2)}
+                      ).toFixed(2)}{" "}
+                      ETH
                     </div>
                     <div className="absolute right-0 text-right text-black text-xs p-1">
-                      ${parseFloat(formatEther(milestone.targetAmt)).toFixed(2)}
+                      {parseFloat(formatEther(milestone.targetAmt)).toFixed(2)}{" "}
+                      ETH
                     </div>
                   </div>
                   <FileUploadDialog

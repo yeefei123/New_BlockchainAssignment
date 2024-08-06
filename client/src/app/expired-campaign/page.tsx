@@ -391,10 +391,6 @@ const AllCampaigns = () => {
                         <p className="mb-2 text-black">
                           <strong>Target:</strong> {campaign.target} ETH
                         </p>
-                        <p className="mb-2 text-black">
-                          <strong>Days Left for Current Milestone:</strong>{" "}
-                          {daysLeft}
-                        </p>
                         <p className="truncate text-black">
                           <strong>Owner:</strong> {campaign.owner}
                         </p>
