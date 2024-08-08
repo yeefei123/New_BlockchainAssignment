@@ -294,14 +294,15 @@ const CampaignDetails: React.FC = () => {
   }, [id, walletAddress]);
 
   const handleCampaign = async (id: string) => {
+    setLoading(true);
+    // Ensure React updates the state before navigating
+    await new Promise((resolve) => setTimeout(resolve, 0)); // Brief delay to allow state update
     if (id) {
-      setLoading(true);
       router.push(`/campaignOnwers/${id}`);
-      setLoading(false);
     } else {
       alert("Campaign owner not found");
-      setLoading(false);
     }
+    setLoading(false); // This will be executed after navigation if the navigation is synchronous
   };
 
   const calculateProgress = () => {
@@ -524,9 +525,12 @@ const CampaignDetails: React.FC = () => {
           </button>
           <button
             onClick={() => handleCampaign(campaign.id)}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl focus:outline-none focus:shadow-outline"
+            disabled={loading}
+            className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            View Campaign Owner
+            {loading ? "View Campaign Owner" : "Loading..."}
           </button>
         </div>
         <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8">

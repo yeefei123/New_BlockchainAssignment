@@ -519,7 +519,7 @@ const CampaignDetails: React.FC = () => {
       <div className="w-full h-12 mb-4">
         <button
           type="button"
-          onClick={() => router.push("/")}
+          onClick={() => router.back()}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl focus:outline-none focus:shadow-outline"
         >
           <FontAwesomeIcon icon={faBackward} className="mr-2" />

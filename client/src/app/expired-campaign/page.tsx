@@ -312,7 +312,7 @@ const AllCampaigns = () => {
         </button>
       </div>
       <div className="text-center">
-        <h1 className="text-3xl font-bold mb-5">Expired Campaigns</h1>
+        <h1 className="text-3xl font-bold mb-5">Inactive Campaigns</h1>
         {campaigns.filter((campaign) => {
           const currentMilestone = getCurrentMilestone(campaign.milestones);
           const daysLeft = currentMilestone

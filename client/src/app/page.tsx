@@ -98,10 +98,8 @@ const AllCampaigns = () => {
     const fetchResolvedReports = async () => {
       try {
         const response = await fetch("/api/userReports?status=resolved");
-        console.log(response);
         if (response.ok) {
           const data: Report[] = await response.json();
-          console.log(data);
           if (data !== null || undefined) {
             setResolvedReports(data);
             setReportsLoaded(true);
@@ -157,8 +155,6 @@ const AllCampaigns = () => {
               (report) => report.campaign_id === campaign.id
             )
         );
-
-        console.log(filteredCampaigns);
         setCampaigns(filteredCampaigns);
       } catch (error) {
         console.error("Error fetching campaigns:", error);
@@ -207,7 +203,6 @@ const AllCampaigns = () => {
       (timeDiff % (1000 * 3600 * 24)) / (1000 * 3600)
     );
     const minutesLeft = Math.floor((timeDiff % (1000 * 3600)) / (1000 * 60));
-
     return `${daysLeft} days, ${hoursLeft} hours, and ${minutesLeft} minutes left`;
   };
 
@@ -264,37 +259,37 @@ const AllCampaigns = () => {
     );
   };
 
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <div className="flex items-center">
-          <svg
-            className="animate-spin h-5 w-5 text-gray-500"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            ></circle>
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8v8H4z"
-            ></path>
-          </svg>
-          <span className="text-gray-500 text-xl font-bold ml-2">
-            Loading...
-          </span>
-        </div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="flex flex-col items-center justify-center min-h-screen">
+  //       <div className="flex items-center">
+  //         <svg
+  //           className="animate-spin h-5 w-5 text-gray-500"
+  //           xmlns="http://www.w3.org/2000/svg"
+  //           fill="none"
+  //           viewBox="0 0 24 24"
+  //         >
+  //           <circle
+  //             className="opacity-25"
+  //             cx="12"
+  //             cy="12"
+  //             r="10"
+  //             stroke="currentColor"
+  //             strokeWidth="4"
+  //           ></circle>
+  //           <path
+  //             className="opacity-75"
+  //             fill="currentColor"
+  //             d="M4 12a8 8 0 018-8v8H4z"
+  //           ></path>
+  //         </svg>
+  //         <span className="text-gray-500 text-xl font-bold ml-2">
+  //           Loading...
+  //         </span>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   const handleCreateCampaign = async () => {
     if (!isLoggedIn) {
@@ -316,11 +311,11 @@ const AllCampaigns = () => {
         );
         return;
       }
-      setLoading(true);
       setCampaignButtonLoading(true);
-      router.push("checkUsers");
-      setLoading(false);
-      setCampaignButtonLoading(false);
+      setTimeout(() => {
+        router.push("checkUsers");
+        setCampaignButtonLoading(false);
+      }, 300);
     } catch (error) {
       console.error("Error connecting to MetaMask:", error);
       alert(
@@ -339,141 +334,179 @@ const AllCampaigns = () => {
   };
 
   return (
-    <div className="campaigns-container flex min-h-screen flex-col items-center">
-      <div className="w-full h-12 mb-4">
-        <button
-          type="button"
-          disabled={!isLoggedIn || campaignButtonLoading}
-          onClick={handleCreateCampaign}
-          className={`px-4 py-2 rounded flex items-center ${
-            !isLoggedIn || campaignButtonLoading
-              ? "bg-gray-500 text-gray-400 cursor-not-allowed"
-              : "bg-blue-500 text-white hover:bg-blue-700"
-          }`}
-        >
-          <FontAwesomeIcon icon={faPlus} className="mr-2" />
-          {campaignButtonLoading ? "Loading..." : "Create Campaign"}
-        </button>
-      </div>
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-5">All Campaigns</h1>
-        {campaigns && campaigns.length === 0 && !loading ? (
-          <p>No campaigns found.</p>
-        ) : (
-          <div>
-            {campaigns.filter((campaign) => {
-              const currentMilestone = getCurrentMilestone(campaign.milestones);
-              const daysLeft = currentMilestone
-                ? calculateDaysLeft(currentMilestone)
-                : "N/A";
-              return daysLeft !== "Expired";
-            }).length === 0 ? (
-              <p>No campaign available.</p>
-            ) : (
-              <div className="grid gap-8 grid-cols-1 text-center md:grid-cols-2 lg:grid-cols-3">
-                {campaigns
-                  .filter((campaign) => {
-                    const currentMilestone = getCurrentMilestone(
-                      campaign.milestones
-                    );
-                    const daysLeft = currentMilestone
-                      ? calculateDaysLeft(currentMilestone)
-                      : "N/A";
-                    return daysLeft !== "Expired" && daysLeft !== "N/A";
-                  })
-                  .map((campaign) => {
-                    const { text: truncatedDescription, isLong } =
-                      truncateDescription(campaign.description);
-                    const isExpanded = expandedCampaigns.has(campaign.id);
-                    const currentMilestone = getCurrentMilestone(
-                      campaign.milestones
-                    );
-                    const daysLeft = currentMilestone
-                      ? calculateDaysLeft(currentMilestone)
-                      : "N/A";
+    <div>
+      {!loading ? (
+        <div className="campaigns-container flex min-h-screen flex-col items-center">
+          <div className="w-full h-12 mb-4">
+            <button
+              type="button"
+              disabled={!isLoggedIn || campaignButtonLoading}
+              onClick={handleCreateCampaign}
+              className={`px-4 py-2 rounded flex items-center ${
+                !isLoggedIn || campaignButtonLoading
+                  ? "bg-gray-500 text-gray-400 cursor-not-allowed"
+                  : "bg-blue-500 text-white hover:bg-blue-700"
+              }`}
+            >
+              <FontAwesomeIcon icon={faPlus} className="mr-2" />
+              {campaignButtonLoading ? "Loading..." : "Create Campaign"}
+            </button>
+          </div>
 
-                    // Only display the campaign if it is not expired
-                    if (daysLeft === "Expired") {
-                      return null;
-                    }
+          <div className="text-center">
+            <h1 className="text-3xl font-bold mb-5">Active Campaigns</h1>
+            {campaigns && campaigns.length > 0 ? (
+              campaigns.filter((campaign) => {
+                const currentMilestone = getCurrentMilestone(
+                  campaign.milestones
+                );
+                const daysLeft = currentMilestone
+                  ? calculateDaysLeft(currentMilestone)
+                  : "N/A";
 
-                    return (
-                      <div
-                        className="border bg-opacity-75 bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out"
-                        key={campaign.id}
-                      >
-                        <Image
-                          src={campaign.images}
-                          alt={campaign.title}
-                          className="rounded-t-lg hover:scale-105 transition-transform duration-300 ease-in-out"
-                          width={500}
-                          height={300}
-                          layout="responsive"
-                        />
-                        <div className="p-4">
-                          <h2 className="text-xl text-black font-bold mb-2">
-                            {campaign.title}
-                          </h2>
-                          <p
-                            className={`text-gray-600 ${
-                              isExpanded ? "block" : "hidden"
-                            }`}
-                          >
-                            {campaign.description}
-                          </p>
-                          {!isExpanded && (
-                            <>
-                              <p className="text-gray-600">
-                                {truncatedDescription}
-                              </p>
+                // Ensure the campaign is not expired
+                return daysLeft !== "Expired" && daysLeft !== "N/A";
+              }).length > 0 ? (
+                <div className="grid gap-8 grid-cols-1 text-center md:grid-cols-2 lg:grid-cols-3">
+                  {campaigns
+                    .filter((campaign) => {
+                      const currentMilestone = getCurrentMilestone(
+                        campaign.milestones
+                      );
+                      const daysLeft = currentMilestone
+                        ? calculateDaysLeft(currentMilestone)
+                        : "N/A";
+
+                      return daysLeft !== "Expired" && daysLeft !== "N/A";
+                    })
+                    .map((campaign) => {
+                      const { text: truncatedDescription, isLong } =
+                        truncateDescription(campaign.description);
+                      const isExpanded = expandedCampaigns.has(campaign.id);
+                      const currentMilestone = getCurrentMilestone(
+                        campaign.milestones
+                      );
+                      const daysLeft = currentMilestone
+                        ? calculateDaysLeft(currentMilestone)
+                        : "N/A";
+
+                      // Skip expired campaigns
+                      if (daysLeft === "Expired") {
+                        return null;
+                      }
+
+                      return (
+                        <div
+                          className="border bg-opacity-75 bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow duration-300 ease-in-out"
+                          key={campaign.id}
+                        >
+                          <Image
+                            src={campaign.images}
+                            alt={campaign.title}
+                            className="rounded-t-lg hover:scale-105 transition-transform duration-300 ease-in-out"
+                            width={500}
+                            height={300}
+                            layout="responsive"
+                          />
+                          <div className="p-4">
+                            <h2 className="text-xl text-black font-bold mb-2">
+                              {campaign.title}
+                            </h2>
+                            <p
+                              className={`text-gray-600 ${
+                                isExpanded ? "block" : "hidden"
+                              }`}
+                            >
+                              {campaign.description}
+                            </p>
+                            {!isExpanded && (
+                              <>
+                                <p className="text-gray-600">
+                                  {truncatedDescription}
+                                </p>
+                                <ReadMoreButton
+                                  isLong={isLong}
+                                  onClick={() => toggleExpand(campaign.id)}
+                                  isExpanded={isExpanded}
+                                />
+                              </>
+                            )}
+                            {isExpanded && (
                               <ReadMoreButton
                                 isLong={isLong}
                                 onClick={() => toggleExpand(campaign.id)}
                                 isExpanded={isExpanded}
                               />
-                            </>
-                          )}
-                          {isExpanded && (
-                            <ReadMoreButton
-                              isLong={isLong}
-                              onClick={() => toggleExpand(campaign.id)}
-                              isExpanded={isExpanded}
-                            />
-                          )}
-                          <div className="mt-4 text-left">
-                            <p className="mb-2 text-black">
-                              <strong>Target:</strong> {campaign.target} ETH
-                            </p>
-                            <p className="mb-2 text-black">
-                              <strong>Days Left for Current Milestone:</strong>{" "}
-                              {daysLeft}
-                            </p>
-                            <p className="truncate text-black">
-                              <strong>Owner:</strong> {campaign.owner}
-                            </p>
+                            )}
+                            <div className="mt-4 text-left">
+                              <p className="mb-2 text-black">
+                                <strong>Target:</strong> {campaign.target} ETH
+                              </p>
+                              <p className="mb-2 text-black">
+                                <strong>
+                                  Days Left for Current Milestone:
+                                </strong>{" "}
+                                {daysLeft}
+                              </p>
+                              <p className="truncate text-black">
+                                <strong>Owner:</strong> {campaign.owner}
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => handleButtonClick(campaign.id)}
+                              disabled={buttonLoading[campaign.id]}
+                              className={`bg-blue-500 text-white px-4 py-2 rounded mt-2 hover:bg-blue-700 ${
+                                buttonLoading[campaign.id]
+                                  ? "opacity-50 cursor-not-allowed"
+                                  : ""
+                              }`}
+                            >
+                              {buttonLoading[campaign.id]
+                                ? "Loading..."
+                                : "View Details"}
+                            </button>
                           </div>
-                          <button
-                            onClick={() => handleButtonClick(campaign.id)}
-                            disabled={buttonLoading[campaign.id]}
-                            className={`bg-blue-500 text-white px-4 py-2 rounded mt-2 hover:bg-blue-700 ${
-                              buttonLoading[campaign.id]
-                                ? "opacity-50 cursor-not-allowed"
-                                : ""
-                            }`}
-                          >
-                            {buttonLoading[campaign.id]
-                              ? "Loading..."
-                              : "View Details"}
-                          </button>
                         </div>
-                      </div>
-                    );
-                  })}
-              </div>
+                      );
+                    })}
+                </div>
+              ) : (
+                <p>No campaigns found.</p>
+              )
+            ) : (
+              <p>No campaigns found.</p>
             )}
           </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center min-h-screen">
+          <div className="flex items-center">
+            <svg
+              className="animate-spin h-5 w-5 text-gray-500"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v8H4z"
+              ></path>
+            </svg>
+            <span className="text-gray-500 text-xl font-bold ml-2">
+              Loading...
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

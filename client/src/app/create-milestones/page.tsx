@@ -18,7 +18,7 @@ const CreateMilestonesPage = () => {
     useContext(FormContext);
   const [currentStep, setCurrentStep] = useState(0);
   const milestonesCount = parseInt(campaignData.milestones, 10);
-
+  const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState<
     Partial<Record<keyof MilestoneData, string>>
   >({
@@ -115,6 +115,10 @@ const CreateMilestonesPage = () => {
       errors.amount = "Valid Target Amount (in ETH) is required";
       valid = false;
     }
+    if (Number(milestone.amount) < 0) {
+      errors.amount = "Valid Target Amount (in ETH) is required";
+      valid = false;
+    }
     if (!milestone?.startDate?.trim()) {
       errors.startDate = "Start Date is required";
       valid = false;
@@ -151,7 +155,11 @@ const CreateMilestonesPage = () => {
       setCurrentStep(currentStep + 1);
     } else {
       setMilestonesData(localMilestones);
-      router.push("/summary");
+      setLoading(true);
+      setTimeout(() => {
+        router.push("summary");
+        setLoading(false);
+      }, 300);
     }
   };
 
@@ -305,9 +313,16 @@ const CreateMilestonesPage = () => {
             <button
               type="button"
               onClick={handleNext}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              disabled={loading}
             >
-              {currentStep === milestonesCount - 1 ? "Finish" : "Next"}
+              {loading
+                ? "Loading..."
+                : currentStep === milestonesCount - 1
+                ? "Finish"
+                : "Next"}
             </button>
           </div>
         </form>

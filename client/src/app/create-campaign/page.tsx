@@ -201,8 +201,10 @@ export default function CreateCampaignPage() {
 
     setCampaignData(form);
 
-    router.push("/create-milestones");
-    setLoading(false);
+    setTimeout(() => {
+      router.push("create-milestones");
+      setLoading(false);
+    }, 300);
   };
 
   const handleMilestonesChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -337,9 +339,9 @@ export default function CreateCampaignPage() {
           <button
             type="submit"
             className={`mt-2 bg-green-500 hover:bg-gray-700 text-white font-bold py-4 px-4 rounded-xl focus:outline-none focus:shadow-outline ${
-              !isFormValid && "opacity-50 cursor-not-allowed"
+              !isFormValid || loading ? "opacity-50 cursor-not-allowed" : ""
             }`}
-            disabled={!isFormValid}
+            disabled={!isFormValid || loading}
           >
             {loading ? (
               <div className="flex mb-5 justify-center items-center">
