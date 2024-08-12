@@ -87,8 +87,8 @@ const CreateMilestonesPage = () => {
   const getMinStartDate = (index: number) => {
     if (index === 0) return getTodayDate();
     const prevEndDate = localMilestones[index - 1]?.endDate;
-    // return prevEndDate ? addDays(prevEndDate, 3) : getTodayDate();
-    return prevEndDate ? prevEndDate : getTodayDate();
+    return prevEndDate ? addDays(prevEndDate, 3) : getTodayDate();
+    // return prevEndDate ? prevEndDate : getTodayDate();
   };
 
   const validateStep = () => {
