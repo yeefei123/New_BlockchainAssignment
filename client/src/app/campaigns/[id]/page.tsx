@@ -24,7 +24,7 @@ const CampaignDetails: React.FC = () => {
   const { id } = useParams();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [targetAchived, setTargetAchived] = useState<boolean>(false);
-
+  const [errors, setErrors] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string>("");
   const [campaign, setCampaign] = useState<any>(null);
   const [donationAmount, setDonationAmount] = useState<string | number>("");
@@ -128,13 +128,26 @@ const CampaignDetails: React.FC = () => {
   const getCurrentMilestone = (milestones: any[]) => {
     const now = new Date();
 
-    for (const milestone of milestones) {
+    for (let i = 0; i < milestones.length; i++) {
+      const milestone = milestones[i];
       const startDate = ethers.BigNumber.isBigNumber(milestone.startDate)
         ? new Date(milestone.startDate.toNumber())
         : new Date(milestone.startDate);
       const endDate = ethers.BigNumber.isBigNumber(milestone.endDate)
         ? new Date(milestone.endDate.toNumber())
         : new Date(milestone.endDate);
+
+      if (i > 0 && milestones[i - 1] && milestones[i - 1].documentURL == "") {
+        console.log(milestone.campaignId.toNumber(), id);
+
+        if (milestone.campaignId.toNumber().toString() === id) {
+          console.log(
+            `Cannot start milestone ${milestone.id} because the previous milestone's document has not been uploaded.`
+          );
+        }
+        return null;
+      }
+
       if (now >= startDate && now <= endDate) {
         return milestone;
       }
@@ -366,8 +379,6 @@ const CampaignDetails: React.FC = () => {
         fileUpload: currentMilestone.documentURL,
         issueType: issueType,
       };
-
-      console.log(formData);
       try {
         const response = await fetch("/api/userReports", {
           method: "POST",
@@ -573,6 +584,7 @@ const CampaignDetails: React.FC = () => {
           />
           <div className="text-black mt-6">
             <h2 className="text-xl font-semibold mb-2">Current Milestone</h2>
+
             {currentMilestone ? (
               <div className="mb-4 text-black">
                 <h3 className="font-bold">{currentMilestone.title}</h3>
@@ -615,18 +627,43 @@ const CampaignDetails: React.FC = () => {
                 />
                 <button
                   className={`bg-blue-500 text-white p-2 rounded-xl ${
-                    buttonLoading || !isLoggedIn || !walletAddress
+                    buttonLoading ||
+                    !isLoggedIn ||
+                    !walletAddress ||
+                    parseFloat(
+                      formatEther(currentMilestone.donationAmountCollected)
+                    ).toFixed(2) >=
+                      parseFloat(
+                        formatEther(currentMilestone.targetAmt)
+                      ).toFixed(2)
                       ? "bg-gray-500 cursor-not-allowed"
                       : "hover:bg-blue-700"
                   }`}
                   onClick={() => handleDonate(currentMilestone.id)}
-                  disabled={buttonLoading || !isLoggedIn || !walletAddress}
+                  disabled={
+                    buttonLoading ||
+                    !isLoggedIn ||
+                    !walletAddress ||
+                    parseFloat(
+                      formatEther(currentMilestone.donationAmountCollected)
+                    ).toFixed(2) >=
+                      parseFloat(
+                        formatEther(currentMilestone.targetAmt)
+                      ).toFixed(2)
+                  }
                 >
                   {buttonLoading ? "Donating ..." : "Donate To This Milestone"}
                 </button>
               </div>
             ) : (
               <p>No active milestone at the moment</p>
+            )}
+
+            {errors && (
+              <p className="text-red-500 text-xs italic">
+                The proof of document for the previous campaign is not uploaded
+                yet.
+              </p>
             )}
           </div>
         </div>
@@ -658,7 +695,6 @@ const CampaignDetails: React.FC = () => {
                 hasUploaded ||
                 (currentMilestone &&
                   new Date() < new Date(currentMilestone.startDate)) ||
-                milestone.documentURL != null ||
                 milestone.documentURL != "";
 
               return (

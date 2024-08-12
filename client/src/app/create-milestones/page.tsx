@@ -18,7 +18,7 @@ const CreateMilestonesPage = () => {
     useContext(FormContext);
   const [currentStep, setCurrentStep] = useState(0);
   const milestonesCount = parseInt(campaignData.milestones, 10);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<
     Partial<Record<keyof MilestoneData, string>>
   >({
@@ -87,7 +87,8 @@ const CreateMilestonesPage = () => {
   const getMinStartDate = (index: number) => {
     if (index === 0) return getTodayDate();
     const prevEndDate = localMilestones[index - 1]?.endDate;
-    return prevEndDate ? addDays(prevEndDate, 3) : getTodayDate();
+    // return prevEndDate ? addDays(prevEndDate, 3) : getTodayDate();
+    return prevEndDate ? prevEndDate : getTodayDate();
   };
 
   const validateStep = () => {

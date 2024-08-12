@@ -167,17 +167,25 @@ const AllCampaigns = () => {
     fetchCampaigns();
   }, [resolvedReports, reportsLoaded, contractAddress]);
 
-  const getCurrentMilestone = (milestones: Milestone[]): Milestone | null => {
+  const getCurrentMilestone = (milestones: any[]) => {
     const now = new Date();
-    now.setHours(0, 0, 0, 0);
 
-    for (const milestone of milestones) {
+    for (let i = 0; i < milestones.length; i++) {
+      const milestone = milestones[i];
       const startDate = ethers.BigNumber.isBigNumber(milestone.startDate)
         ? new Date(milestone.startDate.toNumber())
         : new Date(milestone.startDate);
       const endDate = ethers.BigNumber.isBigNumber(milestone.endDate)
         ? new Date(milestone.endDate.toNumber())
         : new Date(milestone.endDate);
+
+      if (i > 0 && milestones[i - 1] && milestones[i - 1].documentURL == "") {
+        console.log(
+          `Cannot start milestone ${milestone.id} because the previous milestone's document has not been uploaded.`
+        );
+
+        return null;
+      }
 
       if (now >= startDate && now <= endDate) {
         return milestone;
