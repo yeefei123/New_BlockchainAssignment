@@ -1,6 +1,6 @@
 "use client";
 
-import { faBackward, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faBackward } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ethers } from "ethers";
 import Image from "next/image";
@@ -303,7 +303,7 @@ const AllCampaigns = () => {
           Back
         </button>
       </div>
-      <div className="w-full h-12 mb-4">
+      {/* <div className="w-full h-12 mb-4">
         <button
           type="button"
           disabled={!isLoggedIn}
@@ -317,7 +317,7 @@ const AllCampaigns = () => {
           <FontAwesomeIcon icon={faPlus} className="mr-2" />
           Create Campaign
         </button>
-      </div>
+      </div> */}
       <div className="text-center">
         <h1 className="text-3xl font-bold mb-5">Inactive Campaigns</h1>
         {campaigns.filter((campaign) => {

@@ -656,8 +656,10 @@ const CampaignDetails: React.FC = () => {
               const isButtonDisabled =
                 !isCompleted ||
                 hasUploaded ||
-                new Date() < new Date(currentMilestone.startDate) ||
-                milestone.documentURL;
+                (currentMilestone &&
+                  new Date() < new Date(currentMilestone.startDate)) ||
+                milestone.documentURL != null ||
+                milestone.documentURL != "";
 
               return (
                 <div key={index} className="mb-4 text-black">
@@ -684,6 +686,12 @@ const CampaignDetails: React.FC = () => {
 
                   <h3 className="font-bold">{milestone.title}</h3>
                   <p>{milestone.milestonedescription}</p>
+                  {milestone.documentURL && (
+                    <div>
+                      <strong>Proof of document:</strong>
+                      <p>{milestone.documentURL}</p>
+                    </div>
+                  )}
                   <div>
                     <p>
                       <strong>Duration:</strong>{" "}
