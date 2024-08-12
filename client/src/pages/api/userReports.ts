@@ -55,7 +55,7 @@ export default async function handler(
       if (status === "pending") {
         query += ` WHERE status = 'Pending'`;
       } else if (status === "resolved") {
-        query += ` WHERE status = 'Resolved'`;
+        query += ` WHERE status = 'Approved'`;
       } else {
         return res
           .status(400)

@@ -1,6 +1,6 @@
 "use client";
 
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faBackward, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ethers } from "ethers";
 import Image from "next/image";
@@ -142,9 +142,6 @@ const AllCampaigns = () => {
       const endDate = ethers.BigNumber.isBigNumber(milestone.endDate)
         ? new Date(milestone.endDate.toNumber())
         : new Date(milestone.endDate);
-
-      startDate.setHours(0, 0, 0, 0);
-      endDate.setHours(0, 0, 0, 0);
       if (now >= startDate && now <= endDate) {
         return milestone;
       }
@@ -296,6 +293,16 @@ const AllCampaigns = () => {
 
   return (
     <div className="campaigns-container flex min-h-screen flex-col items-center">
+      <div className="w-full h-12 mb-4">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl focus:outline-none focus:shadow-outline"
+        >
+          <FontAwesomeIcon icon={faBackward} className="mr-2" />
+          Back
+        </button>
+      </div>
       <div className="w-full h-12 mb-4">
         <button
           type="button"

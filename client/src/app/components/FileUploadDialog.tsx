@@ -23,12 +23,12 @@ const FileUploadDialog: React.FC<FileUploadDialogProps> = ({
 
   const handleUpload = async () => {
     if (selectedFile) {
-      setIsLoading(true); // Set loading to true
+      setIsLoading(true);
       try {
         await onUpload(selectedFile);
       } finally {
         setSelectedFile(null);
-        setIsLoading(false); // Set loading to false after upload is complete
+        setIsLoading(false);
       }
     }
   };

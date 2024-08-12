@@ -100,6 +100,7 @@ const AllCampaigns = () => {
         const response = await fetch("/api/userReports?status=resolved");
         if (response.ok) {
           const data: Report[] = await response.json();
+          console.log(data);
           if (data !== null || undefined) {
             setResolvedReports(data);
             setReportsLoaded(true);
@@ -178,8 +179,6 @@ const AllCampaigns = () => {
         ? new Date(milestone.endDate.toNumber())
         : new Date(milestone.endDate);
 
-      startDate.setHours(0, 0, 0, 0);
-      endDate.setHours(0, 0, 0, 0);
       if (now >= startDate && now <= endDate) {
         return milestone;
       }
@@ -386,6 +385,8 @@ const AllCampaigns = () => {
                       const currentMilestone = getCurrentMilestone(
                         campaign.milestones
                       );
+                      console.log(campaign.milestones);
+                      console.log(currentMilestone);
                       const daysLeft = currentMilestone
                         ? calculateDaysLeft(currentMilestone)
                         : "N/A";

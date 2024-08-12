@@ -13,16 +13,14 @@ export default async function handler(
 
   if (method === "PUT") {
     try {
-      const companyId = id as string;
+      const campaign_id = id as string;
       const query = `
-        UPDATE UserReports 
-        SET status = 'Resolved'
-        WHERE campaign_id = ?
+        UPDATE userReports SET status = 'Approved' WHERE campaign_id = ?
       `;
 
       const connection = await pool.getConnection();
       const [result] = await connection.query<ResultSetHeader>(query, [
-        companyId,
+        campaign_id,
       ]);
       connection.release();
 

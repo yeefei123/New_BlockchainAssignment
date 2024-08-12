@@ -196,7 +196,7 @@ const CampaignDetails: React.FC = () => {
           return;
         }
         const now = new Date();
-        const nowTimestamp = Math.floor(now.getTime() / 1000); // Convert to seconds
+        const nowTimestamp = Math.floor(now.getTime() / 1000);
 
         const contract = new ethers.Contract(
           contractAddress,
@@ -414,9 +414,7 @@ const CampaignDetails: React.FC = () => {
 
       const current = ethers.utils.parseEther(currentString);
       const target = ethers.utils.parseEther(targetString);
-      if (current === target) {
-        setTargetAchived(true);
-      }
+
       return current.mul(100).div(target).toNumber();
     } catch (error) {
       console.error("Error calculating progress:", error);
@@ -440,7 +438,11 @@ const CampaignDetails: React.FC = () => {
       const month = String(date.getMonth() + 1).padStart(2, "0");
       const year = date.getFullYear();
 
-      return `${day}/${month}/${year}`;
+      const hours = String(date.getHours()).padStart(2, "0");
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+      const seconds = String(date.getSeconds()).padStart(2, "0");
+
+      return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
     } catch (error) {
       console.error("Error formatting date:", error);
       return "Invalid date";
@@ -613,20 +615,12 @@ const CampaignDetails: React.FC = () => {
                 />
                 <button
                   className={`bg-blue-500 text-white p-2 rounded-xl ${
-                    buttonLoading ||
-                    !isLoggedIn ||
-                    !walletAddress ||
-                    !targetAchived
+                    buttonLoading || !isLoggedIn || !walletAddress
                       ? "bg-gray-500 cursor-not-allowed"
                       : "hover:bg-blue-700"
                   }`}
                   onClick={() => handleDonate(currentMilestone.id)}
-                  disabled={
-                    buttonLoading ||
-                    !isLoggedIn ||
-                    !walletAddress ||
-                    !targetAchived
-                  }
+                  disabled={buttonLoading || !isLoggedIn || !walletAddress}
                 >
                   {buttonLoading ? "Donating ..." : "Donate To This Milestone"}
                 </button>

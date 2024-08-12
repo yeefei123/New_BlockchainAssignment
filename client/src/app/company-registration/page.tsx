@@ -1,5 +1,7 @@
 "use client";
 
+import { faBackward } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import bcrypt from "bcryptjs";
 import { ethers } from "ethers";
 import Image from "next/image";
@@ -324,6 +326,16 @@ const CompanyRegistrationPage = (props: any) => {
           {userExists && userStatus !== "Pending" ? (
             <>
               <div className="campaigns-container flex flex-col justify-center items-center">
+                <div className="w-full h-12 mb-4">
+                  <button
+                    type="button"
+                    onClick={() => router.push("/")}
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl focus:outline-none focus:shadow-outline"
+                  >
+                    <FontAwesomeIcon icon={faBackward} className="mr-2" />
+                    Back
+                  </button>
+                </div>
                 <h1 className="text-4xl font-bold mb-6">Registration</h1>
                 <form
                   className="w-full bg-gray-500 item-center flex justify-center shadow-md rounded px-8 pt-6 pb-8 mb-4"
