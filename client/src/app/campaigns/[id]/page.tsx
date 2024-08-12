@@ -677,7 +677,7 @@ const CampaignDetails: React.FC = () => {
                               : "bg-blue-500 text-white hover:bg-blue-700"
                           }`}
                           onClick={() => handleOpenDialog(milestone.id)}
-                          disabled={isButtonDisabled || milestone.fileUrl}
+                          disabled={isButtonDisabled}
                         >
                           Upload Document
                         </button>

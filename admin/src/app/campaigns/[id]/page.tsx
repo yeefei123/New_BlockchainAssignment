@@ -631,8 +631,9 @@ const CampaignDetails: React.FC = () => {
               const isButtonDisabled =
                 !isCompleted ||
                 hasUploaded ||
-                (currentMilestone &&
-                  new Date() < new Date(currentMilestone.startDate)) ||
+                new Date() < new Date(currentMilestone.startDate);
+              (currentMilestone &&
+                new Date() < new Date(currentMilestone.startDate)) ||
                 milestone.documentURL != null;
 
               return (
@@ -675,7 +676,7 @@ const CampaignDetails: React.FC = () => {
                   </div>
                   {milestone.documentURL && (
                     <div>
-                      <strong>File Url for this milestone: </strong>
+                      <strong>Proof of document: </strong>
                       <p>{milestone.documentURL}</p>
                     </div>
                   )}
