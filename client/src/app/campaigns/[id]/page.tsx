@@ -690,8 +690,10 @@ const CampaignDetails: React.FC = () => {
                 ).toFixed(2) >=
                 parseFloat(formatEther(milestone.targetAmt)).toFixed(2);
               const hasUploaded = uploadedMilestones.has(milestone.id);
+              const previousMilestone = milestones[index - 1];
               const isButtonDisabled =
-                !isCompleted ||
+                (index != 0 &&
+                  (!previousMilestone || !previousMilestone.fileURL)) ||
                 hasUploaded ||
                 (currentMilestone &&
                   new Date() < new Date(currentMilestone.startDate)) ||

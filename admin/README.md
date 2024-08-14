@@ -50,6 +50,8 @@ password: 12345
 
 use mydb;
 
+SET SQL_SAFE_UPDATES = 1;
+
 CREATE TABLE users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
