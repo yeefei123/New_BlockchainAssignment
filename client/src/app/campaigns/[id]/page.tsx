@@ -691,13 +691,33 @@ const CampaignDetails: React.FC = () => {
                 parseFloat(formatEther(milestone.targetAmt)).toFixed(2);
               const hasUploaded = uploadedMilestones.has(milestone.id);
               const previousMilestone = milestones[index - 1];
+              console.log("previousMilestone", previousMilestone);
+              const isPreviousMilestoneMissingDocument =
+                index > 0 &&
+                (!previousMilestone || previousMilestone.documentURL == "");
+
+              const isAlreadyUploaded = hasUploaded;
+
+              const isBeforeStartDate =
+                currentMilestone &&
+                new Date() < new Date(currentMilestone.startDate);
+
+              const isDocumentAlreadyUploaded = milestone.documentURL != "";
+
+              // Combine all conditions
               const isButtonDisabled =
-                (index != 0 &&
-                  (!previousMilestone || !previousMilestone.fileURL)) ||
-                hasUploaded ||
-                (currentMilestone &&
-                  new Date() < new Date(currentMilestone.startDate)) ||
-                milestone.documentURL != "";
+                isPreviousMilestoneMissingDocument ||
+                isAlreadyUploaded ||
+                isBeforeStartDate ||
+                isDocumentAlreadyUploaded;
+
+              // Log or display which condition is causing the button to be disabled
+              console.log({
+                isPreviousMilestoneMissingDocument,
+                isAlreadyUploaded,
+                isBeforeStartDate,
+                isDocumentAlreadyUploaded,
+              });
 
               return (
                 <div key={index} className="mb-4 text-black">
