@@ -140,11 +140,11 @@ const DonationHistoryPage = () => {
             };
           })
         );
-        console.log("Campaign data after processing:", campaignData);
 
-        const filteredCampaigns = campaignData.filter(
-          (campaign) => campaign.owner === walletAddress // Corrected to filter by campaign owner
+        const filteredCampaigns = campaignData.filter((campaign) =>
+          campaign.donators.some((donator) => donator === walletAddress)
         );
+
         console.log("Filtered campaigns:", filteredCampaigns);
         setCampaigns(filteredCampaigns);
       } catch (error) {
@@ -155,7 +155,7 @@ const DonationHistoryPage = () => {
     };
 
     fetchCampaigns();
-  }, [contractAddress, walletAddress]); // Added walletAddress to dependency array to refetch campaigns when wallet changes
+  }, [contractAddress, walletAddress]);
 
   const getCurrentMilestone = (milestones: Milestone[]): Milestone | null => {
     const now = new Date();

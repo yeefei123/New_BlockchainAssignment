@@ -172,6 +172,26 @@ const CampaignDetails: React.FC = () => {
         !isNaN(Number(donationAmount)) &&
         Number(donationAmount) > 0
       ) {
+        const parsedDonationAmount = parseFloat(donationAmount.toString());
+
+        const currentMilestoneAmount = parseFloat(
+          formatEther(currentMilestone.donationAmountCollected)
+        );
+
+        const totalDonationAmount =
+          parsedDonationAmount + currentMilestoneAmount;
+
+        if (
+          totalDonationAmount >
+          parseFloat(formatEther(currentMilestone.targetAmt))
+        ) {
+          alert(
+            "The donation amount exceeds the target. Please enter a lower amount."
+          );
+          setButtonLoading(false);
+          return;
+        }
+
         const web3 = await web3Modal.connect();
         if (!window.ethereum) {
           alert("Please install MetaMask");
@@ -215,7 +235,6 @@ const CampaignDetails: React.FC = () => {
           signer
         );
 
-        // Ensure the 'id' variable is defined and correctly set
         if (typeof id === "undefined") {
           console.error("Campaign ID is not defined.");
           setLoading(false);
