@@ -1,5 +1,7 @@
 "use client";
 
+import { faBackward } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ethers } from "ethers";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -196,6 +198,16 @@ const SummaryPage = () => {
 
   return (
     <div className="">
+      <div className="w-full h-12 mb-4">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl focus:outline-none focus:shadow-outline"
+        >
+          <FontAwesomeIcon icon={faBackward} className="mr-2" />
+          Back
+        </button>
+      </div>
       <h1 className="text-2xl text-center text-white font-bold mb-6">
         Campaign Summary
       </h1>

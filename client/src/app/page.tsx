@@ -153,9 +153,11 @@ const AllCampaigns = () => {
         const filteredCampaigns = campaignData.filter(
           (campaign) =>
             !resolvedReports.some(
-              (report) => report.campaign_id === campaign.id
+              (report) => report.campaign_id === campaign.id.toNumber()
             )
         );
+
+        console.log(filteredCampaigns);
         setCampaigns(filteredCampaigns);
       } catch (error) {
         console.error("Error fetching campaigns:", error);

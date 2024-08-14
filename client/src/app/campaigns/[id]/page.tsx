@@ -138,8 +138,6 @@ const CampaignDetails: React.FC = () => {
         : new Date(milestone.endDate);
 
       if (i > 0 && milestones[i - 1] && milestones[i - 1].documentURL == "") {
-        console.log(milestone.campaignId.toNumber(), id);
-
         if (milestone.campaignId.toNumber().toString() === id) {
           console.log(
             `Cannot start milestone ${milestone.id} because the previous milestone's document has not been uploaded.`
@@ -566,7 +564,7 @@ const CampaignDetails: React.FC = () => {
                 : "bg-gray-500 text-gray-400 cursor-not-allowed"
             }`}
           >
-            {ownerbuttonLoading ? "Loading..." : "View Campaign Onwer"}
+            {ownerbuttonLoading ? "Loading..." : "View Campaign Owner"}
           </button>
         </div>
         <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8">
@@ -646,7 +644,7 @@ const CampaignDetails: React.FC = () => {
                     !walletAddress ||
                     parseFloat(
                       formatEther(currentMilestone.donationAmountCollected)
-                    ).toFixed(2) >=
+                    ).toFixed(2) ==
                       parseFloat(
                         formatEther(currentMilestone.targetAmt)
                       ).toFixed(2)
@@ -691,7 +689,6 @@ const CampaignDetails: React.FC = () => {
                 parseFloat(formatEther(milestone.targetAmt)).toFixed(2);
               const hasUploaded = uploadedMilestones.has(milestone.id);
               const previousMilestone = milestones[index - 1];
-              console.log("previousMilestone", previousMilestone);
               const isPreviousMilestoneMissingDocument =
                 index > 0 &&
                 (!previousMilestone || previousMilestone.documentURL == "");
@@ -700,24 +697,15 @@ const CampaignDetails: React.FC = () => {
 
               const isBeforeStartDate =
                 currentMilestone &&
-                new Date() < new Date(currentMilestone.startDate);
+                new Date() < new Date(currentMilestone.endDate.toNumber());
 
               const isDocumentAlreadyUploaded = milestone.documentURL != "";
 
-              // Combine all conditions
               const isButtonDisabled =
                 isPreviousMilestoneMissingDocument ||
                 isAlreadyUploaded ||
                 isBeforeStartDate ||
                 isDocumentAlreadyUploaded;
-
-              // Log or display which condition is causing the button to be disabled
-              console.log({
-                isPreviousMilestoneMissingDocument,
-                isAlreadyUploaded,
-                isBeforeStartDate,
-                isDocumentAlreadyUploaded,
-              });
 
               return (
                 <div key={index} className="mb-4 text-black">
