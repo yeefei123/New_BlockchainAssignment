@@ -37,7 +37,7 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
-# database configuration (if haven't configure before)
+## database configuration (if haven't configure before)
 
 1. Download MySql Workbench
 2. Create database
@@ -73,3 +73,26 @@ CREATE TABLE UserReports (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+
+## Cloudinary
+All the files and images are uploaded onto cloud before submitting to cloud
+
+API for the cloudinary:
+https://api.cloudinary.com/v1_1/dt6twx3ee/image/upload
+
+## Small description for the system
+- the system is using both centralize and decentralize database: kyc using sql server and blockchain
+- the system has review team for the company registration and fraud case
+- the system is donation based crowdfunding platform
+- the system is using DAO pricinple  for the fraud case voting
+- the system is using custom smart contract for this blockchain system
+
+For milestone, the user only able to upload document if they are:
+- the campaign owner (Based on the wallet address connected)
+- document Url is first time upload for this milestone
+- today's date is greater than milestone start date
+- the previous milestone should uploaded the document to continue
+
+Active campaign only show the campaign that are not reported as fraud
+Inactive campaign included all the campaign that dont have current milestone
