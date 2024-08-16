@@ -451,7 +451,11 @@ const AllCampaigns = () => {
                             )}
                             <div className="mt-4 text-left">
                               <p className="mb-2 text-black">
-                                <strong>Target:</strong> {campaign.target} ETH
+                                <strong>Current Milestone Target:</strong>{" "}
+                                {parseFloat(
+                                  formatEther(currentMilestone.targetAmt)
+                                ).toFixed(2)}{" "}
+                                ETH
                               </p>
                               <p className="mb-2 text-black">
                                 <strong>

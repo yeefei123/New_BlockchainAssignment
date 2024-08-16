@@ -85,7 +85,7 @@ https://api.cloudinary.com/v1_1/dt6twx3ee/image/upload
 - the system is using both centralize and decentralize database: kyc using sql server and blockchain
 - the system has review team for the company registration and fraud case
 - the system is donation based crowdfunding platform
-- the system is using DAO pricinple  for the fraud case voting
+- the system is using DAO pricinple for the fraud case voting
 - the system is using custom smart contract for this blockchain system
 
 For milestone, the user only able to upload document if they are:
@@ -96,3 +96,10 @@ For milestone, the user only able to upload document if they are:
 
 Active campaign only show the campaign that are not reported as fraud
 Inactive campaign included all the campaign that dont have current milestone
+The campaign still can continue even if the target amount for the previous milestone not achieve but have uploaded proof of documents
+
+Donation is only allowed if
+- the current donation amount is smaller than the target amount
+- the user has connected to MetaMask
+- the donation amount is not empty
+- the donation amount + the current donation collected is smaller than the target amount
